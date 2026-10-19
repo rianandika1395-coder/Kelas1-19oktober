@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Ceria - Agama Kristen Kelas 1</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Load Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Google Fonts: Nunito & Fredoka One for kids style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS Configurations -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Nunito', 'sans-serif'],
+                        'display': ['"Fredoka One"', 'cursive'],
+                    },
+                    colors: {
+                        'pastel-pink': '#FFD1DC',
+                        'pastel-blue': '#AEC6CF',
+                        'pastel-green': '#77DD77',
+                        'pastel-yellow': '#FDFD96',
+                        'pastel-purple': '#C3B1E1',
+                    },
+                    boxShadow: {
+                        'bubbly': '0 4px 0 0 rgba(0,0,0,0.1)',
+                        'bubbly-active': '0 0px 0 0 rgba(0,0,0,0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f0f8ff;
+            background-image: radial-gradient(#AEC6CF 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+        .bubbly-btn {
+            transition: all 0.1s ease;
+        }
+        .bubbly-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 0 rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 font-sans p-4 md:p-8 flex justify-center items-start">
+    <div id="root" class="w-full max-w-2xl"></div>
+
+    <script type="text/babel">
+        // Data Soal
+        const MATCHING_DATA = [
+            { id: 'm1', left: 'Anak bapak Elkana dan ibu Hana', right: 'Samuel' },
+            { id: 'm2', left: 'Bernazar', right: 'Berjanji pada Tuhan' },
+            { id: 'm3', left: 'Orang yang dungu', right: 'Tidak mau mendengar nasihat dan teguran' },
+            { id: 'm4', left: 'Telinga', right: 'Mendengar' },
+            { id: 'm5', left: 'Imam Eli', right: 'Membimbing Samuel menjadi pelayan Tuhan' }
+        ];
+
+        const TF_DATA = [
+            { id: 'tf1', q: 'Kita dapat membedakan suara hewan karena memiliki telinga yang mendengar.', ans: true },
+            { id: 'tf2', q: 'Orang yang tidak dapat mendengar disebut buta.', ans: false },
+            { id: 'tf3', q: 'Samuel bersedia mendengar dan mematuhi apa yang dikatakan oleh Imam Eli.', ans: true },
+            { id: 'tf4', q: 'Tuhan ingin supaya kita menggunakan telinga dengan baik.', ans: true },
+            { id: 'tf5', q: 'Orang dungu yaitu orang yang tidak mau mendengarkan nasihat dan teguran.', ans: true }
+        ];
+
+        const FILL_DATA = [
+            { id: 'f1', q: 'Kedua telinga berguna untuk ....', ans: ['mendengar', 'mendengarkan'] },
+            { id: 'f2', q: 'Imam Eli membimbing Samuel untuk menjadi ....', ans: ['pelayan tuhan', 'pelayan', 'hamba tuhan', 'pelayan allah'] },
+            { id: 'f3', q: 'Amsal 12: 15b: Siapa mendengarkan nasihat, ia ....', ans: ['bijak', 'bijaksana'] },
+            { id: 'f4', q: 'Kita mendengarkan firman Tuhan berarti mendengar suara ....', ans: ['tuhan', 'allah', 'bapa', 'yesus'] },
+            { id: 'f5', q: 'Menggunakan telinga dengan baik yaitu menggunakan telinga sesuai kehendak ....', ans: ['tuhan', 'allah', 'bapa'] }
+        ];
+
+        const ESSAY_DATA = [
+            { id: 'e1', q: 'Apakah artinya menggunakan telinga dengan baik?', keys: ['dengar', 'baik', 'firman', 'nasihat', 'tuhan'] },
+            { id: 'e2', q: 'Apakah janji ibu Hana dalam doanya kepada Tuhan?', keys: ['janji', 'serah', 'samuel', 'anak', 'tuhan', 'bapa'] },
+            { id: 'e3', q: 'Apakah tugas Samuel di rumah Tuhan?', keys: ['layan', 'bantu', 'imam', 'eli', 'tuhan'] },
+            { id: 'e4', q: 'Bagaimanakah ciri-ciri orang bijak?', keys: ['dengar', 'nasihat', 'taat', 'baik'] },
+            { id: 'e5', q: 'Apakah yang dilakukan anak-anak pada gambar di samping?', img: '164637.jpg', keys: ['dengar', 'cerita', 'buku', 'ibu', 'belajar'] }
+        ];
+
+        function StartScreen({ onStart }) {
+            const [name, setName] = React.useState('');
+            const [cls, setCls] = React.useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if(name.trim() && cls) {
+                    onStart(name, cls);
+                } else {
+                    alert('Halo! Jangan lupa isi nama dan pilih kelasmu ya!');
+                }
+            };
+
+            return (
+                <div class="bg-white rounded-3xl p-8 shadow-xl border-4 border-pastel-blue text-center">
+                    <h1 class="font-display text-4xl text-blue-600 mb-2">Kuis Ceria! 🌟</h1>
+                    <h2 class="text-xl font-bold text-gray-600 mb-6">Pendidikan Agama Kristen & Budi Pekerti</h2>
+                    
+                    <img src="https://placehold.co/200x200/FFD1DC/fff?text=Tuhan+Yesus+Memberkati" class="mx-auto rounded-full mb-6 border-4 border-pastel-pink shadow-lg" alt="Welcome" />
+
+                    <form onSubmit={handleSubmit} class="space-y-4">
+                        <div>
+                            <label class="block text-lg font-bold text-gray-700 mb-2">Nama Lengkapmu:</label>
+                            <input 
+                                type="text" 
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                class="w-full text-center text-xl p-3 border-2 border-pastel-blue rounded-2xl focus:outline-none focus:border-blue-500 shadow-sm"
+                                placeholder="Tulis namamu di sini..."
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-lg font-bold text-gray-700 mb-2">Kelas:</label>
+                            <select 
+                                value={cls}
+                                onChange={(e) => setCls(e.target.value)}
+                                class="w-full text-center text-xl p-3 border-2 border-pastel-green rounded-2xl focus:outline-none focus:border-green-500 shadow-sm"
+                            >
+                                <option value="">Pilih Kelasmu...</option>
+                                <option value="1A">Kelas 1A</option>
+                                <option value="1B">Kelas 1B</option>
+                                <option value="1C">Kelas 1C</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="bubbly-btn w-full mt-6 bg-pastel-yellow border-2 border-yellow-400 text-yellow-800 font-display text-2xl py-4 rounded-3xl shadow-bubbly hover:bg-yellow-300">
+                            Mulai Belajar! 🚀
+                        </button>
+                    </form>
+                </div>
+            );
+        }
+
+        function MatchingScreen({ onNext }) {
+            const [matches, setMatches] = React.useState({});
+            const [selectedLeft, setSelectedLeft] = React.useState(null);
+            
+            // Acak pilihan di sebelah kanan
+            const [rightOptions, setRightOptions] = React.useState([]);
+            
+            React.useEffect(() => {
+                const shuffled = [...MATCHING_DATA].sort(() => Math.random() - 0.5);
+                setRightOptions(shuffled);
+            }, []);
+
+            const colors = ['bg-red-200', 'bg-blue-200', 'bg-green-200', 'bg-yellow-200', 'bg-purple-200'];
+
+            const handleLeftClick = (id) => {
+                setSelectedLeft(id);
+            };
+
+            const handleRightClick = (rightId) => {
+                if (selectedLeft) {
+                    setMatches({ ...matches, [selectedLeft]: rightId });
+                    setSelectedLeft(null); // Reset selection
+                }
+            };
+
+            const handleReset = () => {
+                setMatches({});
+                setSelectedLeft(null);
+            }
+
+            const getLeftColor = (id, index) => {
+                if (matches[id]) {
+                    const matchIndex = Object.keys(matches).indexOf(id);
+                    return colors[matchIndex % colors.length];
+                }
+                if (selectedLeft === id) return 'bg-yellow-300 ring-4 ring-yellow-400';
+                return 'bg-gray-100 hover:bg-gray-200';
+            };
+
+            const getRightColor = (id) => {
+                const matchedLeftId = Object.keys(matches).find(key => matches[key] === id);
+                if (matchedLeftId) {
+                    const matchIndex = Object.keys(matches).indexOf(matchedLeftId);
+                    return colors[matchIndex % colors.length];
+                }
+                return 'bg-gray-100 hover:bg-gray-200';
+            };
+
+            const isComplete = Object.keys(matches).length === 5;
+
+            return (
+                <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-pastel-purple">
+                    <h2 class="font-display text-2xl text-purple-600 mb-2">Bagian III: Mencocokkan 🧩</h2>
+                    <p class="text-lg text-gray-600 mb-6 font-semibold">Tariklah garis (klik kotak kiri, lalu klik kotak kanan) untuk menghubungkan pasangan yang tepat!</p>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 mb-8">
+                        {/* Kiri */}
+                        <div class="flex-1 flex flex-col gap-3">
+                            {MATCHING_DATA.map((item, idx) => (
+                                <button 
+                                    key={item.id}
+                                    onClick={() => handleLeftClick(item.id)}
+                                    class={`p-4 rounded-xl text-left font-bold transition-all border-2 border-gray-300 ${getLeftColor(item.id, idx)}`}
+                                >
+                                    {idx + 1}. {item.left}
+                                </button>
+                            ))}
+                        </div>
+                        
+                        {/* Kanan */}
+                        <div class="flex-1 flex flex-col gap-3">
+                            {rightOptions.map((item, idx) => (
+                                <button 
+                                    key={`r-${item.id}`}
+                                    onClick={() => handleRightClick(item.id)}
+                                    disabled={!selectedLeft && !Object.values(matches).includes(item.id)}
+                                    class={`p-4 rounded-xl text-left font-bold transition-all border-2 border-gray-300 ${getRightColor(item.id)} ${(selectedLeft && !Object.values(matches).includes(item.id)) ? 'cursor-pointer hover:scale-105 shadow-md' : 'opacity-80'}`}
+                                >
+                                    {String.fromCharCode(65 + idx)}. {item.right}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-4">
+                        <button onClick={handleReset} class="bg-red-400 text-white font-bold py-2 px-4 rounded-xl hover:bg-red-500">
+                            Ulangi Pasangan
+                        </button>
+                        <button 
+                            onClick={() => onNext({ matches })}
+                            disabled={!isComplete}
+                            class={`font-display text-xl py-3 px-8 rounded-2xl ${isComplete ? 'bg-pastel-green text-green-900 border-2 border-green-500 shadow-bubbly bubbly-btn hover:bg-green-400' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                        >
+                            Lanjut! ➡️
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function TrueFalseScreen({ onNext }) {
+            const [answers, setAnswers] = React.useState({});
+            
+            const handleAnswer = (qId, val) => {
+                setAnswers({ ...answers, [qId]: val });
+            };
+
+            const isComplete = Object.keys(answers).length === 5;
+
+            return (
+                <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-pastel-pink">
+                    <h2 class="font-display text-2xl text-pink-600 mb-2">Bagian IV: Benar atau Salah? 🤔</h2>
+                    <p class="text-lg text-gray-600 mb-6 font-semibold">Pilih tombol BENAR atau SALAH untuk setiap pernyataan di bawah ini!</p>
+                    
+                    <div class="space-y-4">
+                        {TF_DATA.map((item, idx) => (
+                            <div key={item.id} class="bg-pink-50 rounded-2xl p-4 border-2 border-pink-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                                <p class="text-lg font-bold text-gray-700 flex-1">{idx + 1}. {item.q}</p>
+                                <div class="flex gap-2 w-full md:w-auto">
+                                    <button 
+                                        onClick={() => handleAnswer(item.id, true)}
+                                        class={`flex-1 md:w-24 py-3 rounded-xl font-bold text-white transition-colors ${answers[item.id] === true ? 'bg-green-500 ring-4 ring-green-300' : 'bg-gray-300 hover:bg-green-400'}`}
+                                    >
+                                        BENAR
+                                    </button>
+                                    <button 
+                                        onClick={() => handleAnswer(item.id, false)}
+                                        class={`flex-1 md:w-24 py-3 rounded-xl font-bold text-white transition-colors ${answers[item.id] === false ? 'bg-red-500 ring-4 ring-red-300' : 'bg-gray-300 hover:bg-red-400'}`}
+                                    >
+                                        SALAH
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div class="flex justify-end mt-8">
+                        <button 
+                            onClick={() => onNext({ tfAnswers: answers })}
+                            disabled={!isComplete}
+                            class={`font-display text-xl py-3 px-8 rounded-2xl ${isComplete ? 'bg-pastel-blue text-blue-900 border-2 border-blue-500 shadow-bubbly bubbly-btn hover:bg-blue-400' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                        >
+                            Lanjut! ➡️
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function FillInScreen({ onNext }) {
+            const [answers, setAnswers] = React.useState({});
+            
+            const handleInput = (qId, val) => {
+                setAnswers({ ...answers, [qId]: val });
+            };
+
+            const isComplete = Object.keys(answers).length === 5 && Object.values(answers).every(a => a.trim() !== '');
+
+            return (
+                <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-pastel-yellow">
+                    <h2 class="font-display text-2xl text-yellow-600 mb-2">Bagian V: Isian Singkat ✍️</h2>
+                    <p class="text-lg text-gray-600 mb-6 font-semibold">Isilah titik-titik di bawah ini dengan jawaban yang tepat!</p>
+                    
+                    <div class="space-y-6">
+                        {FILL_DATA.map((item, idx) => (
+                            <div key={item.id} class="bg-yellow-50 rounded-2xl p-4 border-2 border-yellow-200">
+                                <p class="text-lg font-bold text-gray-700 mb-3">{idx + 1}. {item.q}</p>
+                                <input 
+                                    type="text" 
+                                    value={answers[item.id] || ''}
+                                    onChange={(e) => handleInput(item.id, e.target.value)}
+                                    class="w-full text-xl p-3 border-2 border-yellow-300 rounded-xl focus:outline-none focus:border-yellow-500 shadow-inner bg-white"
+                                    placeholder="Tulis jawabanmu..."
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                    <div class="flex justify-end mt-8">
+                        <button 
+                            onClick={() => onNext({ fillAnswers: answers })}
+                            disabled={!isComplete}
+                            class={`font-display text-xl py-3 px-8 rounded-2xl ${isComplete ? 'bg-pastel-purple text-purple-900 border-2 border-purple-500 shadow-bubbly bubbly-btn hover:bg-purple-400' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                        >
+                            Lanjut! ➡️
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function EssayScreen({ onNext }) {
+            const [answers, setAnswers] = React.useState({});
+            
+            const handleInput = (qId, val) => {
+                setAnswers({ ...answers, [qId]: val });
+            };
+
+            const isComplete = Object.keys(answers).length === 5 && Object.values(answers).every(a => a.trim() !== '');
+
+            return (
+                <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-pastel-green">
+                    <h2 class="font-display text-2xl text-green-700 mb-2">Bagian VI: Jawab Pertanyaan 📝</h2>
+                    <p class="text-lg text-gray-600 mb-6 font-semibold">Jawablah pertanyaan di bawah ini dengan benar! Minta bantuan guru jika kesulitan mengetik panjang.</p>
+                    
+                    <div class="space-y-6">
+                        {ESSAY_DATA.map((item, idx) => (
+                            <div key={item.id} class="bg-green-50 rounded-2xl p-4 border-2 border-green-200">
+                                {item.img && (
+                                    <div class="mb-4 text-center">
+                                        <img src={item.img} alt="Gambar Pertanyaan" class="mx-auto rounded-xl shadow-md max-w-full h-auto" style={{maxHeight: '200px'}} />
+                                    </div>
+                                )}
+                                <p class="text-lg font-bold text-gray-700 mb-3">{idx + 1}. {item.q}</p>
+                                <textarea 
+                                    rows="2"
+                                    value={answers[item.id] || ''}
+                                    onChange={(e) => handleInput(item.id, e.target.value)}
+                                    class="w-full text-lg p-3 border-2 border-green-300 rounded-xl focus:outline-none focus:border-green-500 shadow-inner bg-white"
+                                    placeholder="Jawabanku adalah..."
+                                ></textarea>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div class="flex justify-end mt-8">
+                        <button 
+                            onClick={() => onNext({ essayAnswers: answers })}
+                            disabled={!isComplete}
+                            class={`font-display text-xl py-3 px-8 rounded-2xl ${isComplete ? 'bg-pastel-pink text-pink-900 border-2 border-pink-500 shadow-bubbly bubbly-btn hover:bg-pink-400' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                        >
+                            Selesai & Kumpulkan! 🏆
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function ResultScreen({ data, onRestart }) {
+            const [showReview, setShowReview] = React.useState(false);
+            
+            // Logika Penilaian (Maksimal 100, 20 soal x 5 poin)
+            let totalScore = 0;
+            let correctCount = 0;
+            let wrongCount = 0;
+            let reviewNeeded = false;
+            
+            const results = {
+                matching: [],
+                tf: [],
+                fill: [],
+                essay: []
+            };
+
+            // Koreksi Matching
+            Object.keys(data.matches).forEach((leftId) => {
+                const ansRightId = data.matches[leftId];
+                // Karena data asli id-nya sama urutannya, ini mempermudah
+                const isCorrect = MATCHING_DATA.find(m => m.id === leftId).id === ansRightId; 
+                // Wait, right items share same id as left in my array structure!
+                const matchedItem = MATCHING_DATA.find(m => m.id === leftId);
+                const isMatchCorrect = matchedItem.id === ansRightId; // True if they match
+
+                if (isMatchCorrect) { totalScore += 5; correctCount++; }
+                else { wrongCount++; }
+
+                results.matching.push({ q: matchedItem.left, ans: isMatchCorrect ? "Benar" : "Salah", correct: isMatchCorrect });
+            });
+
+            // Koreksi True/False
+            TF_DATA.forEach((item) => {
+                const userAns = data.tfAnswers[item.id];
+                const isCorrect = userAns === item.ans;
+                
+                if (isCorrect) { totalScore += 5; correctCount++; }
+                else { wrongCount++; }
+
+                results.tf.push({ q: item.q, userAns: userAns ? 'Benar' : 'Salah', trueAns: item.ans ? 'Benar' : 'Salah', correct: isCorrect });
+            });
+
+            // Koreksi Fill In
+            FILL_DATA.forEach((item) => {
+                const userAns = (data.fillAnswers[item.id] || '').trim().toLowerCase();
+                const isCorrect = item.ans.some(a => userAns.includes(a));
+                
+                if (isCorrect) { totalScore += 5; correctCount++; }
+                else { wrongCount++; }
+
+                results.fill.push({ q: item.q, userAns, trueAns: item.ans[0], correct: isCorrect });
+            });
+
+            // Koreksi Essay (Keyword Based + Flag for Review)
+            ESSAY_DATA.forEach((item) => {
+                const userAns = (data.essayAnswers[item.id] || '').trim().toLowerCase();
+                let hasKeyword = false;
+                item.keys.forEach(k => { if(userAns.includes(k)) hasKeyword = true; });
+
+                if (hasKeyword && userAns.length > 5) {
+                    totalScore += 5;
+                    correctCount++;
+                    results.essay.push({ q: item.q, userAns, correct: true, review: false });
+                } else {
+                    reviewNeeded = true;
+                    results.essay.push({ q: item.q, userAns, correct: false, review: true });
+                }
+            });
+
+            let motivationMsg = "";
+            let medalColor = "";
+            if (totalScore >= 90) { motivationMsg = "Hebat Sekali! Kamu sangat pintar! 🌟"; medalColor = "text-yellow-500"; }
+            else if (totalScore >= 70) { motivationMsg = "Bagus! Kamu anak yang rajin belajar! 👍"; medalColor = "text-gray-400"; }
+            else { motivationMsg = "Tetap semangat! Mari belajar lebih giat lagi! 💪"; medalColor = "text-orange-500"; }
+
+            return (
+                <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-pastel-blue">
+                    {!showReview ? (
+                        <div class="text-center">
+                            <h2 class="font-display text-4xl text-blue-600 mb-4">Hore! Kuis Selesai! 🎉</h2>
+                            
+                            <div class="bg-blue-50 rounded-2xl p-6 mb-6 inline-block w-full max-w-sm border-2 border-blue-200 shadow-md">
+                                <div class="text-6xl mb-4">
+                                    <span class={medalColor}>🎖️</span>
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-800">{data.studentName}</h3>
+                                <p class="text-lg text-gray-600 mb-4">Kelas {data.cls}</p>
+                                
+                                <div class="bg-white rounded-xl p-4 border-2 border-dashed border-blue-300">
+                                    <p class="text-gray-500 font-bold mb-1">Nilai Kamu:</p>
+                                    <p class="font-display text-6xl text-blue-600">{totalScore}</p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-xl font-bold text-gray-700 mb-2">{motivationMsg}</p>
+                            <p class="text-gray-600 mb-2">Jawaban Benar: <span class="font-bold text-green-600">{correctCount}</span> | Salah: <span class="font-bold text-red-600">{wrongCount}</span></p>
+                            
+                            {reviewNeeded && (
+                                <div class="bg-yellow-100 text-yellow-800 p-3 rounded-xl mb-6 text-sm font-bold border border-yellow-300">
+                                    ⚠️ Ada beberapa jawaban uraian yang perlu diperiksa Guru. Nilai kamu mungkin bertambah!
+                                </div>
+                            )}
+
+                            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+                                <button 
+                                    onClick={() => setShowReview(true)}
+                                    class="bg-pastel-purple border-2 border-purple-400 text-purple-900 font-bold py-3 px-6 rounded-2xl shadow-bubbly bubbly-btn hover:bg-purple-300"
+                                >
+                                    🔍 Lihat Pembahasan
+                                </button>
+                                <button 
+                                    onClick={onRestart}
+                                    class="bg-pastel-pink border-2 border-pink-400 text-pink-900 font-bold py-3 px-6 rounded-2xl shadow-bubbly bubbly-btn hover:bg-pink-300"
+                                >
+                                    🔄 Ulangi Kuis
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="font-display text-2xl text-blue-600">Hasil Pekerjaanmu 📝</h2>
+                                <button onClick={() => setShowReview(false)} class="text-gray-500 hover:text-gray-800 font-bold text-xl">✖️</button>
+                            </div>
+                            
+                            <div class="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+                                {/* Bagian III */}
+                                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                    <h3 class="font-bold text-lg mb-3">Bagian III (Mencocokkan)</h3>
+                                    {results.matching.map((r, i) => (
+                                        <p key={i} class="text-sm mb-1">
+                                            {r.correct ? '✅' : '❌'} {r.q}
+                                        </p>
+                                    ))}
+                                </div>
+
+                                {/* Bagian IV */}
+                                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                    <h3 class="font-bold text-lg mb-3">Bagian IV (Benar/Salah)</h3>
+                                    {results.tf.map((r, i) => (
+                                        <div key={i} class="mb-2 text-sm">
+                                            <p class="font-semibold">{i+1}. {r.q}</p>
+                                            <p class={r.correct ? 'text-green-600' : 'text-red-600'}>
+                                                {r.correct ? '✅' : '❌'} Jawab: {r.userAns} (Kunci: {r.trueAns})
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Bagian V */}
+                                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                    <h3 class="font-bold text-lg mb-3">Bagian V (Isian)</h3>
+                                    {results.fill.map((r, i) => (
+                                        <div key={i} class="mb-2 text-sm">
+                                            <p class="font-semibold">{i+1}. {r.q}</p>
+                                            <p class={r.correct ? 'text-green-600' : 'text-red-600'}>
+                                                {r.correct ? '✅' : '❌'} Jawab: "{r.userAns}" (Kunci: {r.trueAns})
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Bagian VI */}
+                                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                    <h3 class="font-bold text-lg mb-3">Bagian VI (Uraian)</h3>
+                                    {results.essay.map((r, i) => (
+                                        <div key={i} class="mb-3 text-sm">
+                                            <p class="font-semibold">{i+1}. {r.q}</p>
+                                            <p class="text-gray-700 italic border-l-4 border-gray-300 pl-2 my-1">"{r.userAns}"</p>
+                                            {r.review ? (
+                                                <p class="text-yellow-600 font-bold">⚠️ Perlu Diperiksa Guru</p>
+                                            ) : (
+                                                <p class="text-green-600 font-bold">✅ Benar (Poin otomatis)</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 text-center">
+                                <button 
+                                    onClick={onRestart}
+                                    class="bg-pastel-pink border-2 border-pink-400 text-pink-900 font-bold py-3 px-8 rounded-2xl shadow-bubbly bubbly-btn hover:bg-pink-300 w-full"
+                                >
+                                    🔄 Mulai Baru (Selesai)
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function App() {
+            const [step, setStep] = React.useState(0);
+            const [quizData, setQuizData] = React.useState({
+                studentName: '',
+                cls: '',
+                matches: {},
+                tfAnswers: {},
+                fillAnswers: {},
+                essayAnswers: {}
+            });
+
+            const handleStart = (name, cls) => {
+                setQuizData({ ...quizData, studentName: name, cls: cls });
+                setStep(1);
+            };
+
+            const handleNext = (dataToMerge) => {
+                setQuizData({ ...quizData, ...dataToMerge });
+                setStep(step + 1);
+                window.scrollTo(0, 0); // Scroll top
+            };
+
+            const handleRestart = () => {
+                setQuizData({
+                    studentName: '',
+                    cls: '',
+                    matches: {},
+                    tfAnswers: {},
+                    fillAnswers: {},
+                    essayAnswers: {}
+                });
+                setStep(0);
+                window.scrollTo(0, 0);
+            };
+
+            // Render komponen berdasarkan langkah (step)
+            let CurrentComponent;
+            switch(step) {
+                case 0: CurrentComponent = <StartScreen onStart={handleStart} />; break;
+                case 1: CurrentComponent = <MatchingScreen onNext={handleNext} />; break;
+                case 2: CurrentComponent = <TrueFalseScreen onNext={handleNext} />; break;
+                case 3: CurrentComponent = <FillInScreen onNext={handleNext} />; break;
+                case 4: CurrentComponent = <EssayScreen onNext={handleNext} />; break;
+                case 5: CurrentComponent = <ResultScreen data={quizData} onRestart={handleRestart} />; break;
+                default: CurrentComponent = <StartScreen onStart={handleStart} />;
+            }
+
+            return (
+                <div class="w-full pb-10">
+                    {/* Header Progress Sederhana */}
+                    {step > 0 && step < 5 && (
+                        <div class="mb-4 flex justify-between items-center bg-white py-2 px-4 rounded-full shadow-sm">
+                            <span class="font-bold text-gray-600">Hai, {quizData.studentName}! 👋</span>
+                            <span class="text-sm font-bold bg-pastel-blue px-3 py-1 rounded-full text-blue-800">Bagian {step} dari 4</span>
+                        </div>
+                    )}
+                    
+                    {/* Render Konten */}
+                    <div class="animate-[fadeIn_0.5s_ease-in-out]">
+                        {CurrentComponent}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body>
+</html>
